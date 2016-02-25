@@ -1,0 +1,852 @@
+swagger: '2.0'
+info:
+  title: ACINO API
+  description: RESTful HTTP API with methods for the North-Bound interface
+  version: 0.0.1
+host: acino.testbed.se
+schemes:
+  - https
+basePath: /v1
+produces:
+  - application/json
+paths:
+  /service:
+    get:
+      summary: 'Get the list of services currently run by the customer'
+      description: 'ACINO provides a list of services that the customer has started or scheduled.'
+      tags:
+        - Services
+      responses:
+        '200':
+          description: 'A list of valid services created by this customer'
+          schema:
+            $ref: '#/definitions/Service'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: 'Create a new service'
+      description: 'Request the creation or scheduling of a new service'
+      tags:
+        - Services
+      parameters:
+        - name: service
+          in: body
+          description: 'Definition of the service to be created.'
+          required: true
+          schema:
+            $ref: '#/definitions/Service'
+      responses:
+        '200':
+          description: 'The service creation succeeded.'
+          schema:
+            $ref: '#/definitions/Service'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /service/{serviceId}:
+    get:
+      summary: 'Get the overview of a specific service by specifying its service ID.'
+      description: 'Get the overview of a spefific service by specifying its service ID.'
+      tags:
+        - Services
+      parameters:
+        - name: serviceId
+          in: path
+          description: 'Service Unique ID of the service for which the overview is requested.'
+          required: true
+          type: string
+      responses:
+        '200':
+          description: 'The specification of the Service requested'
+          schema:
+            $ref: '#/definitions/Service'
+        default:
+          description: 'Unexpected error'
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: 'Update specific service.'
+      description: 'Update specific service.'
+      tags:
+        - Services
+      parameters:
+        - name: serviceId
+          in: path
+          description: 'ID of the service to update. FIXME: Why do we need the ID? It is contained in the service definition since it is an existing service!'
+          required: true
+          type: string
+        - name: service
+          in: body
+          description: 'New definition of the service.'
+          required: true
+          schema:
+            $ref: '#/definitions/Service'
+      responses:
+        '200':
+          description: 'The specification of the Service after the update.'
+          schema:
+            type: object
+            items:
+              $ref: '#/definitions/Service'
+        default:
+          description: 'Unexpected error'
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: 'Delete a specific service by specifying its service ID.'
+      description: 'Delete a specific service by specifying its service ID.'
+      tags:
+        - Services
+      parameters:
+        - name: serviceId
+          in: path
+          description: 'Service Unique ID of the service for which the deletion is requested.'
+          required: true
+          type: string
+      responses:
+        '200':
+          description: 'The service has been deleted.'
+        default:
+          description: 'Unexpected error'
+          schema:
+            $ref: '#/definitions/Error'
+  /service/{service_id}/{intent_id}:
+    get:
+      summary: 'Get the overview of a specific intent in a service by specifying the service and intent IDs.'
+      description: 'Get the overview of a specific intent in a service by specifying the service and intent IDs.'
+      parameters:
+        - name: service_id
+          in: path
+          description: 'Service Unique ID of the service containinf the Intent of interest.'
+          required: true
+          type: string
+        - name: intent_id
+          in: path
+          description: 'Intent Unique ID of the intent for which the overview is requested.'
+          required: true
+          type: string
+      tags:
+        - Services
+        - Intents
+      responses:
+        '200':
+          description: 'The specification of the Intent requested'
+          schema:
+            $ref: '#/definitions/Intent'
+        default:
+          description: 'Unexpected error'
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: 'Update a specific intent in a service by specifying the service and intent IDs.'
+      description: 'Update a specific intent in a service by specifying the service and intent IDs.'
+      parameters:
+        - name: service_id
+          in: path
+          description: 'Service Unique ID of the service containinf the Intent of interest.'
+          required: true
+          type: string
+        - name: intent_id
+          in: path
+          description: 'Intent Unique ID of the intent for which the overview is requested.'
+          required: true
+          type: string
+        - name: intent
+          in: body
+          description: 'Updated definition of the Intent.'
+          required: true
+          schema:
+            $ref: '#/definitions/Intent'
+      tags:
+        - Services
+        - Intents
+      responses:
+        '200':
+          description: 'The specification of the updated Intent.'
+          schema:
+            $ref: '#/definitions/Intent'
+        default:
+          description: 'Unexpected error'
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: 'Delete a specific intent in a service by specifying the service and intent IDs.'
+      description: 'Delete a specific intent in a service by specifying the service and intent IDs.'
+      parameters:
+        - name: service_id
+          in: path
+          description: 'Service Unique ID of the service containinf the Intent of interest.'
+          required: true
+          type: string
+        - name: intent_id
+          in: path
+          description: 'Intent Unique ID of the intent for which the overview is requested.'
+          required: true
+          type: string
+      tags:
+        - Services
+        - Intents
+      responses:
+        '200':
+          description: 'Confirming the deletion of the Intent. FIXME: We need to specify when this was the only Intent in the Service. What happens then? the Service is deleted?'
+        default:
+          description: 'Unexpected error'
+          schema:
+            $ref: '#/definitions/Error'
+  /connectionpoint:
+    get:
+      summary: 'Get the list of the defined ConnectionPoints.'
+      description: 'Get the list of the defined ConnectionPoints.'
+      tags:
+        - ConnectionPoints
+      responses:
+        '200':
+          description: 'A list of valid connection points is returned.'
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ConnectionPoint'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /connectionpoint/{name}:
+    get:
+      summary: 'Get the overview of a specific ConnectionPoint by specifying its name.'
+      description: 'Get the overview of a specific ConnectionPoint by specifying its name.'
+      tags:
+        - ConnectionPoints
+      parameters:
+        - name: name
+          in: path
+          description: 'Name of the ConnectionPoint.'
+          required: true
+          type: string
+      responses:
+        '200':
+          description: 'The specification of the ConnectionPoint.'
+          schema:
+            $ref: '#/definitions/ConnectionPoint'
+        default:
+          description: 'Unexpected error'
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: 'Update a ConnectionPoint by specifying its name.'
+      description: 'Update a ConnectionPoint by specifying its name.'
+      tags:
+        - ConnectionPoints
+      parameters:
+        - name: name
+          in: path
+          description: 'Name of the ConnectionPoint.'
+          required: true
+          type: string
+        - name: point
+          in: body
+          description: 'Updated definition of the ConnectionPoint to update.'
+          required: true
+          schema:
+            $ref: '#/definitions/ConnectionPoint'
+      responses:
+        '200':
+          description: 'The specification of the ConnectionPoint.'
+          schema:
+            $ref: '#/definitions/ConnectionPoint'
+        default:
+          description: 'Unexpected error'
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: 'Create a new ConnectionPoint <-> EndPoint mapping.'
+      description: 'Update a ConnectionPoint by specifying its name.'
+      tags:
+        - ConnectionPoints
+      parameters:
+        - name: name
+          in: path
+          description: 'Name of the ConnectionPoint.'
+          required: true
+          type: string
+      responses:
+        '200':
+          description: 'The specification of the ConnectionPoint.'
+          schema:
+            $ref: '#/definitions/ConnectionPoint'
+        default:
+          description: 'Unexpected error'
+          schema:
+            $ref: '#/definitions/Error'
+  /capabilities:
+    get:
+      summary: 'Get the list of capabilities (Actions).'
+      description: 'Get the list of capabilities (Actions).'
+      tags:
+        - Actions
+      responses:
+        '200':
+          description: 'A list of valid Action is returned.'
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Action'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+definitions:
+  Intent:
+    type: object
+    description: 'An Intent consists of an Action, an optional list of Selectors, an optional list of Constraints, an optional list of Calendaring, and an optional list of Priorities.'
+    properties:
+      intent_id:
+        type: string
+        description: 'FIXME - Unique identifier representing a specific intent available - Ska man ha sÃ¥nt?'
+      action:
+        description: 'Action that the Intent refers to'
+        $ref: '#/definitions/Action'
+      selectors:
+        description: 'Optional list of selectors that apply to the Intent.'
+        type: array
+        items:
+          $ref: '#/definitions/Constraint'
+      constraints:
+        description: 'Optional list of constraints that apply to the Intent.'
+        $ref: '#/definitions/Constraint'
+    required:
+      - intent_id
+      - action
+  Service:
+    type: object
+    description: 'A Service consists of a list of Intents, containing at least one.'
+    properties:
+      service_id:
+        type: string
+        description: 'FIXME - Unique identifier representing a specific service available'
+      display_name:
+        type: string
+        description: 'Name of service as displayed to customers'
+      intents:
+        description: 'List of intents associated ti this service. At least one intent needs to be present.'
+        type: array
+        items:
+          $ref: '#/definitions/Intent'
+  Action:
+    description: 'An Action consists of eight classes, each with one or two lists of Subjects.'
+    type: object
+    discriminator: action
+    properties:
+      action:
+        type: string
+        description: 'The selector describes which actual Action class is implemented'
+    required:
+      - action
+
+  Path:
+    description: 'This is the Path action that creates a unidirectional connection from a source to a destination.'
+    allOf:
+      - $ref: '#/definitions/Action'
+      - type: object
+        properties:
+          source:
+            description: 'Source Subject'
+            $ref: '#/definitions/Subject'
+          destination:
+            description: 'Destination Subject'
+            $ref: '#/definitions/Subject'
+        required:
+          - source
+          - destination
+  Multicast:
+    description: 'This is the Multicast action that creates unidirectional connections from a source to many destinations.'
+    allOf:
+      - $ref: '#/definitions/Action'
+      - type: object
+        properties:
+          source:
+            description: 'Source Subject'
+            $ref: '#/definitions/Subject'
+          destination:
+            description: 'Array of destination Subjects'
+            type: array
+            items:
+              $ref: '#/definitions/Subject'
+        required:
+          - source
+          - destination
+  Aggregate:
+    description: 'This is the Aggregate action that creates unidirectional connections from several sources to a unique destination.'
+    allOf:
+      - $ref: '#/definitions/Action'
+      - type: object
+        properties:
+          source:
+            description: 'Source subject'
+            type: array
+            items:
+              $ref: '#/definitions/Subject'
+          destination:
+            description: 'Destination subject'
+            $ref: '#/definitions/Subject'
+        required:
+          - source
+          - destination
+  Connection:
+    description: 'This is the Connection action that creates a bidirectional connection between a source and a destination.'
+    allOf:
+      - $ref: '#/definitions/Action'
+      - type: object
+        properties:
+          source:
+            description: 'Source Subject'
+            $ref: '#/definitions/Subject'
+          destination:
+            description: 'Destination Subject'
+            $ref: '#/definitions/Subject'
+        required:
+          - source
+          - destination
+  Tree:
+    description: 'This is the Tree action that creates bidirectional connections between a Subject and many others.'
+    allOf:
+      - $ref: '#/definitions/Action'
+      - type: object
+        properties:
+          source:
+            description: 'Source Subject'
+            $ref: '#/definitions/Subject'
+          destination:
+            description: 'Array of destination Subjects'
+            type: array
+            items:
+              $ref: '#/definitions/Subject'
+        required:
+          - source
+          - destination
+  Mesh:
+    description: 'This is the Mesh action that creates bidirectional connections between many Subjects.'
+    allOf:
+      - $ref: '#/definitions/Action'
+      - type: object
+        properties:
+          source:
+            description: 'Source Subject'
+            type: array
+            items:
+              $ref: '#/definitions/Subject'
+        required:
+          - source
+  
+  EndPoint:
+    type: object
+    discriminator: end_point
+    description: 'An EndPoints refers to a specific point in the ACINO network that can ingress and egress customer traffic. For the ACINO use cases, the main type of EndPoint is a point on an IP router, but other types are possible too, such as ports on layer 2 switches, OTN time slots, lambdas or fiber connections (although not clearly required by any use case.'
+    properties:
+      object_id:
+        type: string
+        description: End point
+      end_point:
+        type: string
+        description: 'Subclass used: In the current implementation, end_point can be an IPEndPoint, an EthEndPoint, a FiberEndPoint or a LambdaEndPoint.'
+    required:
+      - end_point
+  Subject:
+    description: 'A subject consists of a ConnectionPoint, an optional list of Selectors and an optional list of Constraints.'
+    type: object
+    properties:
+      connection_point:
+        $ref: '#/definitions/ConnectionPoint'
+        description: Ingress of the Subject
+      selectors:
+        type: array
+        description: Optional list of Selectors specifying which traffic belongs to the application class at this ingress connection point.
+        items:
+          $ref: '#/definitions/Selector'
+      constraints:
+        type: array
+        description: 'Optional list of Constraints specifying the service characteristic that the customer is requesting: bandwidth, delay, calendaring, ....'
+        items:
+          $ref: '#/definitions/Constraint'
+  IPEndPoint:
+    description: An EndPoints refers to a specific point in the ACINO network that can ingress and egress customer traffic. This particular EndPoint represents a router and is characterised by an IP address and a port.
+    allOf:
+      - $ref: '#/definitions/EndPoint'
+      - type: object
+        properties:
+          router_id:
+            type: string
+            description: Router ID of the router
+          port_id:
+            type: integer
+            format: int32
+            description: Port ID of the end point
+          in_addr:
+            type: string
+            description: IP addresss of the end point
+          optional:
+            type: string
+            description: Subnets
+        required:
+          - router_id
+          - port_id
+          - in_addr
+  EthEndPoint:
+    description: An EndPoints refers to a specific point in the ACINO network that can ingress and egress customer traffic. This particular EndPoint represents a layer 2 switch and is characterised by a port.
+    allOf:
+      - $ref: '#/definitions/EndPoint'
+      - type: object
+        properties:
+          switch_id:
+            type: string
+            description: Switch ID of the switch
+          port_id:
+            type: integer
+            format: int32
+            description: Port ID of the switch
+          optional:
+            type: string
+            description: MAC address
+        required:
+          - switch_id
+          - port_id
+  FiberEndPoint:
+    description: An EndPoints refers to a specific point in the ACINO network that can ingress and egress customer traffic. This particular EndPoint represents an optical fibre switch and is characterised by a switch name and port number.
+    allOf:
+      - $ref: '#/definitions/EndPoint'
+      - type: object
+        properties:
+          switch_id:
+            type: string
+            description: Optical switch
+          port_id:
+            type: integer
+            format: int32
+            description: Port ID of the optical switch
+        required:
+          - switch_id
+          - port_id
+  LambdaEndPoint:
+    description: An EndPoints refers to a specific point in the ACINO network that can ingress and egress customer traffic.
+    allOf:
+      - $ref: '#/definitions/EndPoint'
+      - type: object
+        properties:
+          switch_id:
+            type: string
+            description: Switch ID of the optical switch
+          port_id:
+            type: integer
+            format: int32
+            description: Port ID of the end point
+          lambda:
+            type: number
+            format: double
+            description: 'Central frequency of the laser - FIXME: frequency or a wavelength?'
+          witdh:
+            type: number
+            format: double
+            description: 'Width of the laser channel - FIXME: frequency or a wavelength?'
+        required:
+          - switch_id
+          - port_id
+          - lambda
+          - witdh
+  ConnectionPoint:
+    type: object
+    description: 'A ConnectionPoint is a customer edge of the ACINO network in an abstract way. It has a relevant meaning within the Application and may be for example "Office-Berlin", "Client-A", etc. ConnectionPoints can refer to multiple EndPoints which are network points relevant to the ACINO orchestrator, such as an IP subnet on a router port, a port on a switch, or a lambda or fiber on an optical device. The mapping between Connection- and EndPoints has to be done a priori, for example as part of a contract negotiation between the ACINO provider and the Application owner. Additionally, a separate interface through the MLTPI or through DISMI may be provided for mappings to be updated during runtime by authorized personnel.'
+    properties:
+      name:
+        type: string
+        description: Connection point Unique name
+      endpoints:
+        type: array
+        description: 'FIXME: Do we need to expose this mapping to the customer?'
+        items:
+          $ref: '#/definitions/EndPoint'
+
+  Selector:
+    type: object
+    discriminator: selector
+    description: 'A selector specifies which traffic belongs to an application class at an ingress connection point, by specifying which flows of the traffic the Action is referring to.'
+    properties:
+      selector:
+        type: string
+        description: 'This class uses subclasses to implement specific Selectorsconstraints. Currently only OpenFlow1.0Selector and GenericSelector are implemented. OpenFlow1.3Selector and PolicyBasedRoutingSelector are on the TODO list.'
+    required:
+      - selector
+  OpenFlow1.0Selector:
+    allOf:
+      - $ref: '#/definitions/Selector'
+      - type: object
+        properties:
+          ingress_port:
+            type: integer
+            format: int32
+            description: Ingress port
+          eth_mac_addr:
+            type: string
+            description: Ethernet source MAC address
+          eth_dest_addr:
+            type: string
+            description: Ethernet destination MAC address
+          eth_protocol_type:
+            type: string
+            description: 'Ethertype, for example IP, ARP, VLAN'
+          vlan_id:
+            type: integer
+            format: int32
+            description: VLAN id
+          vlan_prio:
+            type: string
+            description: 'VLAN priority (pcp) - FIXME: as number or name?'
+          ip_src_addr:
+            type: string
+            description: 'IP source address + mask - FIXME: what format?'
+          ip_dest_addr:
+            type: string
+            description: 'IP destination address + mask - FIXME: what format?'
+          ip_protocol:
+            type: string
+            description: 'for example TCP, UDP, ICMP'
+          ip_tos:
+            type: string
+            description: 'Type of Service bits - FIXME: as number or name?'
+          transport_src_port:
+            type: integer
+            format: int32
+            description: 'TCP/UDP source port, ICMP code'
+          transport_dest_port:
+            type: integer
+            format: int32
+            description: 'TCP/UDP destination port, ICMP code'
+  OpenFlow1.3Selector:
+    description: 'FIXME: To be implemented'
+    allOf:
+      - $ref: '#/definitions/Selector'
+      - type: object
+  PolicyBasedRoutingSelector:
+    description: Selector based on the capabilities of the Linux kernel - to be implemented
+    allOf:
+      - $ref: '#/definitions/Selector'
+      - type: object
+  GenericSelector:
+    description: 'This is the generic Selector.'
+    allOf:
+      - $ref: '#/definitions/Selector'
+      - type: object
+        properties:
+          ip_src_addr:
+            type: string
+            description: 'IP source address + mask - FIXME: what format?'
+          ip_dest_addr:
+            type: string
+            description: 'IP destination address + mask - FIXME: what format?'
+          ip_protocol:
+            type: string
+            description: 'for example TCP, UDP, ICMP'
+          ip_tos:
+            type: string
+            description: 'Type of Service bits - FIXME: as number or name?'
+          ip_dscp:
+            type: string
+            description: 'Differenciated Service Code Point (DSCP) - FIXME: as number or name?'
+          eth_src_mac_addr:
+            type: string
+            description: Ethernet source MAC address
+          eth_dest_addr:
+            type: string
+            description: Ethernet destination MAC address
+          vlan_id:
+            type: integer
+            format: int32
+            description: VLAN id
+          vlan_prio:
+            type: string
+            description: 'VLAN priority (pcp) - FIXME: as number or name?'
+          lambda_centre:
+            type: number
+            format: double
+            description: 'Central frequency of the laser channel - FIXME: frequency or a wavelength?'
+          lambda_witdh:
+            type: number
+            format: double
+            description: 'Width of the laser channel - FIXME: frequency or a wavelength?'
+          gptp_eid:
+            type: string
+            description: GPRS tunnel ID
+        required:
+          - ip_src_addr
+          - ip_dest_addr
+          - ip_protocol
+          - ip_tos
+          - ip_dscp
+
+  Constraint:
+    type: object
+    discriminator: constraint
+    description: 'A constraint refers to a specific service characteristic that the customer is requesting: bandwidth, delay, calendaring, ...'
+    properties:
+      constraint:
+        type: string
+        description: 'This class uses subclasses to implement specific constraints. In the current implementation, a constraint can be a BandwidthConstraint (using the MetroEthBandwidthConstraint, the  ResourceReservationProtocolBandwidthConstraint or just a bitrate parameter), a DelayConstraint (specifying latency and jitter), an AvailabilityConstraint, a SecurityConstraint, a CalendaringConstraint or a PriorityConstraint.'
+    required:
+      - constraint
+  MetroEthBandwidthConstraint:
+    description: 'This bandwidth constraint is formulated as per the Metro Ethernet Forum UNI, defining a profile based on 5 parameters that define two token buckets, Committed and Excess, and how to treat priority tags.'
+    allOf:
+      - $ref: '#/definitions/Constraint'
+      - type: object
+        properties:
+          cir:
+            type: integer
+            format: int32
+            description: Committed Information Rate (bits per second)
+          cbs:
+            type: integer
+            format: int32
+            description: Committed Burst Size (bytes)
+          eir:
+            type: integer
+            format: int32
+            description: Excess Information Rate (bits per second)
+          ebs:
+            type: integer
+            format: int32
+            description: Excess Burst Size (bytes)
+          cm:
+            type: boolean
+            description: 'Color mode (boolean), whether or not to tale customer priority into account'
+  ResourceReservationProtocolBandwidthConstraint:
+    description: 'The Resource Reservation Protocol (RSVP) uses two objects to define the QoS requirements of a reservation, the SENDER_TSPEC (which indicates the requested bandwidth) and the FLOWSPEC (which indicates actual reserved resources) objects. RSVP defines several different versions of these objects, aimed at different types of services (e.g. Controlled-Load and Guaranteed QoS) and underlying technologies.'
+    allOf:
+      - $ref: '#/definitions/Constraint'
+      - type: object
+        properties:
+          r:
+            type: string
+            description: Token Bucket Rate - Sender s estimation of its generated traffic
+          b:
+            type: string
+            description: Token Bucket Size - Sender s estimation of its generated traffic
+          p:
+            type: string
+            description: Peak Data Rate - Senders maximum generated traffic rate (e.g. physical interface speed)
+          m:
+            type: string
+            description: 'Minimum Policed Unit - Minimum packet size generated, including the payload and headers above IP layer header'
+          M:
+            type: string
+            description: Maximum Packet Size - Maximum packet size generated
+  BandwidthConstraint:
+    description: 'The Bandwith constraint simply specifies the minimum guaranteed rate without going into details, allowing underlying layers to set typical default values, or estimate them based on the rate (e.g. using a heuristics as bucket size should correspond to number of packets send during time t at maximum rate). Bandwidth specifies only the minimum guaranteed bandwidth, there may still be additional bandwidth available but ACINO does not provide any guarantees on this bandwidth. The actual configuration of the network, policing/shaping mechanisms and accounting of resources could also be affected by other parameters such as latency, as larger token buffers cause higher latencies in the network.'
+    allOf:
+      - $ref: '#/definitions/Constraint'
+      - type: object
+        properties:
+          bitrate:
+            type: string
+            description: Bitrate
+          MetroEth:
+            $ref: '#/definitions/MetroEthBandwidthConstraint'
+            description: Optional description of the bandwidth constraint using the Metro Ethernet BW definition
+          ResourceReservationProtocol:
+            $ref: '#/definitions/ResourceReservationProtocolBandwidthConstraint'
+            description: Optional description of the bandwidth constraint using the Resource Reservation Protocol BW definition
+  DelayConstraint:
+    description: 'Maximum latency and maximum jitter are simple primitives that are interpreted as one way latency/jitter or two-way latency/jitter depending on the Action they are associated with (i.e. one-way for Path, two-way for Connection).'
+    allOf:
+      - $ref: '#/definitions/Constraint'
+      - type: object
+        properties:
+          latency:
+            type: string
+            description: 'Latency constraint, specified as a time - FIXME: should we use date-time format?'
+          jitter:
+            type: string
+            description: 'Jitter constraint, specified as a time - FIXME: should we use date-time format?'
+  AvailabilityConstraint:
+    description: 'Availability can be specified as an availability percentage or as its equivalent downtime per time period. But a 99% availability over a year may translate into a single down time event of 3.65 days of consecutive unavailability or 313650 events, each with one second of unavailability. While both of these situations represent 99% availability, the consequences for the Application are likely quite different. This constraint allows specifying the availability as a Mean Time To Recovery (MTTR), Mean Time between Failures (MTBF) and as an availability in percentage.'
+    allOf:
+      - $ref: '#/definitions/Constraint'
+      - type: object
+        properties:
+          mttr:
+            type: string
+            description: 'Mean Time To Recovery - FIXME: should we use date-time format?'
+          mtbf:
+            type: string
+            description: 'Mean Time Between Failures  - FIXME: should we use date-time format?'
+          availability:
+            type: string
+            description: ' availability in percentage - should be a double instead?'
+  SecurityConstraint:
+    description: The SecurityConstraint allows requesting a protected (encrypted) connection.
+    allOf:
+      - $ref: '#/definitions/Constraint'
+      - type: object
+        properties:
+          encryption:
+            type: boolean
+            description: ON/OFF - boolean
+          enc_strength:
+            type: string
+            description: 'Specify the type of encryption: cypher and key length'
+          integrity:
+            type: boolean
+            description: ON/OFF - boolean
+          int_strength:
+            type: string
+            description: Specify the type of integrity algorithm
+  CalendaringConstraint:
+    description: 'The calendaring constraint provides the ability to request a service from and to a certain time, or for a certain cost. With this constraint, the application can define: i)   an open-ended service starting at a certain time but without a specified ending;  ii)  a service with both start and end;  iii) a service terminating at a certain point, and  iv)  a service that is not started unless the hourly cost is lower than specified.'
+    allOf:
+      - $ref: '#/definitions/Constraint'
+      - type: object
+        properties:
+          start_time:
+            type: string
+            format: date-time
+            description: The time at which the service should start
+          stop_time:
+            type: string
+            format: date-time
+            description: The time at which the service should end
+          cost_limit:
+            type: string
+            description: The maximum hourly cost of the service
+  PriorityConstraint:
+    description: 'This constraint allows the Application to specify soft priorities, or goals, of the requested service. If there are several network configurations that meet the requirements, priorities are used to choose the most appropriate one. If multiple priorities are included they are taken into account by order.'
+    allOf:
+      - $ref: '#/definitions/Constraint'
+      - type: object
+        properties:
+          availability:
+            type: boolean
+            description: 'If several equivalent routes exist, take the one that is least likely to fail (i.e. possibly the one with the shortest path).'
+          cost:
+            type: boolean
+            description: 'If several equivalent routes exist, take the cheapest one in terms of monetary cost.'
+          latency:
+            type: boolean
+            description: 'If several equivalent routes exist, take the one with the lowest end-to-end latency.'
+          jitter:
+            type: boolean
+            description: 'If several equivalent routes exist, take the one with the lowest end-to-end jitter.'
+          bandwidth:
+            type: boolean
+            description: 'If several equivalent routes exist, take the one the most extra available bandwidth or bandwidth potential, for scaling the service later.'
+
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+      fields:
+        type: string
